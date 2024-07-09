@@ -19,7 +19,6 @@ To get a local copy up and running, follow these steps:
 - Node.js and npm installed
 - Modern web browser
 
-### Installation
 
 ### Installation
 
