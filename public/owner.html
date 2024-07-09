@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Owner Dashboard - Farm Tool Rental</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Owner Dashboard</h1>
+      <div class="card glass-effect">
+        <h2>Add New Farm Vehicle</h2>
+        <form id="addVehicleForm">
+          <input
+            type="text"
+            id="owner"
+            placeholder="Owner Name"
+            required
+            readonly
+          />
+          <input
+            type="text"
+            id="vehicleName"
+            placeholder="Vehicle Name"
+            required
+          />
+          <select id="vehicleType" required>
+            <option value="">Select Vehicle Type</option>
+            <option value="tractor">Tractor</option>
+            <option value="harvester">Harvester</option>
+            <option value="planter">Planter</option>
+            <option value="sprayer">Sprayer</option>
+            <option value="other">Other</option>
+          </select>
+          <input type="text" id="make" placeholder="Make" required />
+          <input type="text" id="model" placeholder="Model" required />
+          <input type="number" id="year" placeholder="Year" required />
+          <textarea
+            id="description"
+            placeholder="Vehicle Description"
+            required
+          ></textarea>
+          <input
+            type="number"
+            id="condition"
+            placeholder="Vehicle Condition (1-10)"
+            min="1"
+            max="10"
+            required
+          />
+          <input
+            type="number"
+            id="rentalRate"
+            placeholder="Rental Rate ($/day)"
+            step="0.01"
+            required
+          />
+          <button type="submit">Add Vehicle</button>
+        </form>
+      </div>
+      <div class="card glass-effect">
+        <h2>My Reputation</h2>
+        <div id="reputationScore"></div>
+      </div>
+      <div class="card glass-effect">
+        <h2>My Farm Vehicles</h2>
+        <div id="myVehicles" class="vehicle-list"></div>
+      </div>
+    </div>
+    <script src="owner.js"></script>
+  </body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Agricultural Tool Rental</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .login-container {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        height: 100vh;
+      }
+      .login-card {
+        width: 300px;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-container">
+      <div class="card glass-effect login-card" onclick="login('owner')">
+        <h2>Owner Login</h2>
+        <p>Click here if you're a tool owner</p>
+      </div>
+      <div class="card glass-effect login-card" onclick="login('customer')">
+        <h2>Customer Login</h2>
+        <p>Click here if you're looking to rent tools</p>
+      </div>
+    </div>
+    <script>
+      function login(type) {
+        const name = prompt(`Enter your name for ${type} login:`);
+        if (name) {
+          localStorage.setItem("userType", type);
+          localStorage.setItem("userName", name);
+          window.location.href =
+            type === "owner" ? "owner.html" : "customer.html";
+        }
+      }
+    </script>
+  </body>
+</html>

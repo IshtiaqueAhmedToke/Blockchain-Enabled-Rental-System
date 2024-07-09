@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Customer Interface - Agricultural Tool Rental</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Agricultural Tool Rental</h1>
+      <div id="itemsContainer" class="tool-grid"></div>
+    </div>
+    <div id="feedbackModal" class="modal">
+      <div class="modal-content">
+        <h2>Provide Feedback</h2>
+        <form id="feedbackForm">
+          <input type="hidden" id="feedbackOwner" name="owner" />
+          <input type="hidden" id="feedbackVehicle" name="vehicleName" />
+          <div class="rating">
+            <p>Rate the condition of the tool:</p>
+            <div class="stars">
+              <span class="material-icons" data-value="1">star_border</span>
+              <span class="material-icons" data-value="2">star_border</span>
+              <span class="material-icons" data-value="3">star_border</span>
+              <span class="material-icons" data-value="4">star_border</span>
+              <span class="material-icons" data-value="5">star_border</span>
+            </div>
+            <input type="hidden" id="ratingValue" name="rating" required />
+          </div>
+          <div>
+            <p>Was the tool delivered on time?</p>
+            <label
+              ><input type="radio" name="onTime" value="yes" required />
+              Yes</label
+            >
+            <label><input type="radio" name="onTime" value="no" /> No</label>
+          </div>
+          <div>
+            <p>Was the price fair?</p>
+            <label
+              ><input type="radio" name="fairPrice" value="yes" required />
+              Yes</label
+            >
+            <label><input type="radio" name="fairPrice" value="no" /> No</label>
+          </div>
+          <button type="submit">Submit Feedback</button>
+        </form>
+      </div>
+    </div>
+    <script src="customer.js"></script>
+  </body>
+</html>
