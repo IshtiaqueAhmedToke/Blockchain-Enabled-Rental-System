@@ -2,9 +2,7 @@
 
 This project is a demonstration of a blockchain-based agricultural tool rental system. It allows users to rent tools securely using blockchain technology to ensure trustability and reputation scoring.
 
-
-![Blockchain Rental](https://github.com/IshtiaqueAhmedToke/Blockchain-Enabled-Rental-System/assets/25567627/91c09403-5502-4902-ac20-815faec50a47)
-
+![Blockchain Rental](https://github.com/IshtiaqueAhmedToke/Blockchain-Enabled-Rental-System/assets/25567627/d10fe1f9-3d39-449e-80e6-87a10219738c)
 
 ## Features
 
