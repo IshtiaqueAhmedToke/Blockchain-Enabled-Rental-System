@@ -6,9 +6,6 @@ async function fetchVehicles() {
         const response = await fetch(`${apiUrl}/vehicles`);
         const vehicles = await response.json();
 
-        const rentedResponse = await fetch(`${apiUrl}/rentedVehicles?renter=${currentUser}`);
-        const rentedVehicles = await rentedResponse.json();
-
         const itemsContainer = document.getElementById("itemsContainer");
         itemsContainer.innerHTML = "";
 
@@ -16,31 +13,12 @@ async function fetchVehicles() {
         const rentedCard = document.createElement("div");
         rentedCard.classList.add("owner-card", "glass-effect");
         rentedCard.innerHTML = `
-            <h2>Your Rented Vehicles</h2>
+            <h2>Your Rented Equipments</h2>
             <div class="vehicle-grid"></div>
         `;
-
-        const rentedVehicleGrid = rentedCard.querySelector('.vehicle-grid');
-
-        rentedVehicles.forEach((vehicle) => {
-            const vehicleElement = document.createElement("div");
-            vehicleElement.classList.add("vehicle-item", "glass-effect");
-            vehicleElement.innerHTML = `
-                <h3>${vehicle.vehicleName}</h3>
-                <p><strong>Owner:</strong> ${vehicle.owner}</p>
-                <p><strong>Description:</strong> ${vehicle.description || 'N/A'}</p>
-                <p><strong>Vehicle Type:</strong> ${vehicle.vehicleType || 'N/A'}</p>
-                <p><strong>Make:</strong> ${vehicle.make || 'N/A'}</p>
-                <p><strong>Model:</strong> ${vehicle.model || 'N/A'}</p>
-                <p><strong>Year:</strong> ${vehicle.year || 'N/A'}</p>
-                <p><strong>Condition:</strong> ${vehicle.condition}/10</p>
-                <p><strong>Rental Rate:</strong> $${vehicle.rentalRate}/day</p>
-                <button onclick="openFeedbackModal('${vehicle.owner}', '${vehicle.vehicleName}')">Provide Feedback</button>
-            `;
-            rentedVehicleGrid.appendChild(vehicleElement);
-        });
-
         itemsContainer.appendChild(rentedCard);
+
+        await fetchRentedVehicles();
 
         // Available Vehicles
         const vehiclesByOwner = vehicles.reduce((acc, vehicle) => {
@@ -55,7 +33,7 @@ async function fetchVehicles() {
             const ownerCard = document.createElement("div");
             ownerCard.classList.add("owner-card", "glass-effect");
             ownerCard.innerHTML = `
-                <h2>${owner}'s Vehicles</h2>
+                <h2>${owner}'s Equipments</h2>
                 <button onclick="viewReputation('${owner}')">View Owner's Reputation</button>
                 <div id="reputation-${owner}" class="reputation"></div>
                 <div class="vehicle-grid"></div>
@@ -84,7 +62,38 @@ async function fetchVehicles() {
         }
     } catch (error) {
         console.error("Error fetching vehicles:", error);
-        alert("Failed to load vehicles. Please try again later.");
+        alert("Failed to load Equipments. Please try again later.");
+    }
+}
+
+async function fetchRentedVehicles() {
+    try {
+        const rentedResponse = await fetch(`${apiUrl}/rentedVehicles?renter=${currentUser}`);
+        const rentedVehicles = await rentedResponse.json();
+
+        const rentedCard = document.querySelector('.owner-card:first-child');
+        const rentedVehicleGrid = rentedCard.querySelector('.vehicle-grid');
+        rentedVehicleGrid.innerHTML = '';
+
+        rentedVehicles.forEach((vehicle) => {
+            const vehicleElement = document.createElement("div");
+            vehicleElement.classList.add("vehicle-item", "glass-effect");
+            vehicleElement.innerHTML = `
+                <h3>${vehicle.vehicleName}</h3>
+                <p><strong>Owner:</strong> ${vehicle.owner}</p>
+                <p><strong>Description:</strong> ${vehicle.description || 'N/A'}</p>
+                <p><strong>Vehicle Type:</strong> ${vehicle.vehicleType || 'N/A'}</p>
+                <p><strong>Make:</strong> ${vehicle.make || 'N/A'}</p>
+                <p><strong>Model:</strong> ${vehicle.model || 'N/A'}</p>
+                <p><strong>Year:</strong> ${vehicle.year || 'N/A'}</p>
+                <p><strong>Condition:</strong> ${vehicle.condition}/10</p>
+                <p><strong>Rental Rate:</strong> $${vehicle.rentalRate}/day</p>
+                <button onclick="openFeedbackModal('${vehicle.owner}', '${vehicle.vehicleName}')">Provide Feedback</button>
+            `;
+            rentedVehicleGrid.appendChild(vehicleElement);
+        });
+    } catch (error) {
+        console.error("Error fetching rented vehicles:", error);
     }
 }
 
@@ -105,10 +114,31 @@ async function rentVehicle(owner, vehicleName) {
         
         const result = await response.json();
         alert(result.message);
-        fetchVehicles(); // Refresh the vehicles list
+        
+        // Remove the rented vehicle from the UI
+        removeRentedVehicle(owner, vehicleName);
+        
+        // Update the rented vehicles section
+        await fetchRentedVehicles();
     } catch (error) {
         console.error("Error renting vehicle:", error);
         alert(`Error renting vehicle: ${error.message}`);
+    }
+}
+
+function removeRentedVehicle(owner, vehicleName) {
+    const ownerCard = Array.from(document.querySelectorAll('.owner-card h2')).find(h2 => h2.textContent.includes(owner))?.closest('.owner-card');
+    if (ownerCard) {
+        const vehicleElement = Array.from(ownerCard.querySelectorAll('.vehicle-item h3')).find(h3 => h3.textContent === vehicleName)?.closest('.vehicle-item');
+        if (vehicleElement) {
+            vehicleElement.remove();
+            
+            // If this was the last vehicle for this owner, remove the entire owner card
+            const remainingVehicles = ownerCard.querySelectorAll('.vehicle-item');
+            if (remainingVehicles.length === 0) {
+                ownerCard.remove();
+            }
+        }
     }
 }
 

@@ -72,7 +72,7 @@ app.post('/api/rentVehicle', (req, res) => {
             .find(t => t.owner === owner && t.vehicleName === vehicleName && t.type === 'vehicle_addition');
 
         if (!vehicleTransaction) {
-            return res.status(404).json({ message: 'Farm vehicle not found' });
+            return res.status(404).json({ message: 'Equipment not found' });
         }
 
         // Create rental transaction with all vehicle details
@@ -82,9 +82,9 @@ app.post('/api/rentVehicle', (req, res) => {
             type: 'vehicle_rental'
         });
         rentalChain.minePendingTransactions(renter);
-        res.json({ message: 'Farm vehicle rented successfully!' });
+        res.json({ message: 'Equipment rented successfully!' });
     } catch (error) {
-        console.error("Error renting farm vehicle:", error);
+        console.error("Error renting farm Equipment:", error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
@@ -165,9 +165,9 @@ app.post('/api/submitFeedback', (req, res) => {
     const { owner, vehicleName, rating, renter, onTime, fairPrice } = req.body;
 
     // Validate input
-    if (!owner || !vehicleName || !rating || !renter) {
+    if (!owner || !vehicleName || !rating || !renter || onTime === undefined || fairPrice === undefined) {
         console.error("Invalid input. Required fields are missing:", req.body);
-        return res.status(400).json({ message: 'Invalid input. Please provide owner, vehicleName, rating, and renter.' });
+        return res.status(400).json({ message: 'Invalid input. Please provide all required fields.' });
     }
 
     try {
@@ -186,9 +186,9 @@ app.post('/api/submitFeedback', (req, res) => {
             owner,
             vehicleName,
             renter,
-            rating,
-            onTime,
-            fairPrice,
+            rating: parseInt(rating),
+            onTime: Boolean(onTime),
+            fairPrice: Boolean(fairPrice),
             type: 'feedback'
         });
         rentalChain.minePendingTransactions(renter);
@@ -204,7 +204,6 @@ app.post('/api/submitFeedback', (req, res) => {
         res.status(500).json({ message: 'Internal Server Error: ' + error.message });
     }
 });
-
 
 
 app.listen(PORT, () => {

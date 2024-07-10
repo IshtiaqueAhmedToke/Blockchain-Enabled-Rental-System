@@ -101,41 +101,53 @@ class Blockchain {
         let conditionAccuracySum = 0;
         let onTimeDeliveryCount = 0;
         let pricingFairnessSum = 0;
-
+    
         for (const block of this.chain) {
             for (const trans of block.data) {
-                if (trans.owner === address && trans.type === 'vehicle_addition') {
+                if (trans.owner === address && trans.type === 'feedback') {
                     totalTransactions++;
-                    conditionAccuracySum += trans.conditionAccuracy || 0;
-                    onTimeDeliveryCount += trans.onTimeDelivery ? 1 : 0;
-                    pricingFairnessSum += trans.pricingFairness || 0;
+                    conditionAccuracySum += trans.rating * 20; // Convert 5-star rating to percentage
+                    onTimeDeliveryCount += trans.onTime ? 1 : 0;
+                    pricingFairnessSum += trans.fairPrice ? 100 : 0;
                 }
             }
         }
-
+    
         console.log(`Calculating reputation for ${address}. Total transactions: ${totalTransactions}`);
-
+    
         if (totalTransactions === 0) {
             console.log('Not enough transactions to calculate reputation');
-            return null;
+            return 100; // Default score for new users
         }
-
+    
+        // Calculate Customer Feedback Score
         const conditionAccuracyScore = conditionAccuracySum / totalTransactions;
         const onTimeDeliveryScore = (onTimeDeliveryCount / totalTransactions) * 100;
         const pricingFairnessScore = pricingFairnessSum / totalTransactions;
-
-        console.log(`Scores - Condition: ${conditionAccuracyScore}, Delivery: ${onTimeDeliveryScore}, Pricing: ${pricingFairnessScore}`);
-
+    
         const customerFeedbackScore = (conditionAccuracyScore + onTimeDeliveryScore + pricingFairnessScore) / 3;
-        const otherFactorsScore = this.calculateOtherFactors(address);
-
+    
+        console.log(`Customer Feedback Scores - Condition: ${conditionAccuracyScore}, Delivery: ${onTimeDeliveryScore}, Pricing: ${pricingFairnessScore}`);
+        console.log(`Customer Feedback Score: ${customerFeedbackScore}`);
+    
+        // Calculate Other Factors Score
+        const transactionScore = Math.min(totalTransactions * 10, 100);
+        const seasonalRelevance = this.calculateSeasonalRelevance();
+    
+        const otherFactorsScore = (transactionScore * 0.6) + (seasonalRelevance * 0.4);
+    
+        console.log(`Other Factors - Transaction Score: ${transactionScore}, Seasonal Relevance: ${seasonalRelevance}`);
+        console.log(`Other Factors Score: ${otherFactorsScore}`);
+    
+        // Calculate Overall Reputation Score
         const overallScore = (customerFeedbackScore * 0.6) + (otherFactorsScore * 0.4);
-
+    
         console.log(`Final reputation score: ${Math.round(overallScore)}`);
-
+    
         return Math.round(overallScore);
     }
-
+    
+  
     calculateOtherFactors(address) {
         const transactionCount = this.getTransactionCount(address);
         const seasonalRelevance = this.calculateSeasonalRelevance();
@@ -149,7 +161,7 @@ class Blockchain {
     calculateSeasonalRelevance() {
         const currentMonth = new Date().getMonth();
         let baseScore;
-
+    
         if (currentMonth >= 2 && currentMonth <= 4) {
             baseScore = 90; // Spring
         } else if (currentMonth >= 5 && currentMonth <= 7) {
@@ -159,10 +171,11 @@ class Blockchain {
         } else {
             baseScore = 60; // Winter
         }
-
+    
         const randomFactor = Math.floor(Math.random() * 11) - 5; // -5 to +5
         return Math.max(0, Math.min(100, baseScore + randomFactor));
     }
+
 
     getTransactionCount(address) {
         return this.chain
