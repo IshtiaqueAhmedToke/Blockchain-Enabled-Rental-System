@@ -66,6 +66,7 @@ async function fetchVehicles() {
     }
 }
 
+
 async function fetchRentedVehicles() {
     try {
         const rentedResponse = await fetch(`${apiUrl}/rentedVehicles?renter=${currentUser}`);
@@ -88,6 +89,7 @@ async function fetchRentedVehicles() {
                 <p><strong>Year:</strong> ${vehicle.year || 'N/A'}</p>
                 <p><strong>Condition:</strong> ${vehicle.condition}/10</p>
                 <p><strong>Rental Rate:</strong> $${vehicle.rentalRate}/day</p>
+                <p><strong>Rental End Date:</strong> ${new Date(vehicle.rentalEndDate).toLocaleDateString()}</p>
                 <button onclick="openFeedbackModal('${vehicle.owner}', '${vehicle.vehicleName}')">Provide Feedback</button>
             `;
             rentedVehicleGrid.appendChild(vehicleElement);
@@ -97,14 +99,19 @@ async function fetchRentedVehicles() {
     }
 }
 
+
+
 async function rentVehicle(owner, vehicleName) {
     try {
+        const rentalDuration = prompt("Enter rental duration in days:", "1");
+        if (!rentalDuration) return;
+
         const response = await fetch(`${apiUrl}/rentVehicle`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ owner, vehicleName, renter: currentUser }),
+            body: JSON.stringify({ owner, vehicleName, renter: currentUser, rentalDuration: parseInt(rentalDuration) }),
         });
         
         if (!response.ok) {
@@ -115,10 +122,7 @@ async function rentVehicle(owner, vehicleName) {
         const result = await response.json();
         alert(result.message);
         
-        // Remove the rented vehicle from the UI
         removeRentedVehicle(owner, vehicleName);
-        
-        // Update the rented vehicles section
         await fetchRentedVehicles();
     } catch (error) {
         console.error("Error renting vehicle:", error);
