@@ -53,20 +53,19 @@ app.post('/api/addVehicle', (req, res) => {
             type: 'vehicle_addition' 
         });
         rentalChain.minePendingTransactions(owner);
-        res.json({ message: 'Farm vehicle added to the blockchain!' });
+        res.json({ message: 'Equipment added to the blockchain!' });
     } catch (error) {
-        console.error("Error adding farm vehicle:", error);
+        console.error("Error adding  equipment:", error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
 
 app.post('/api/rentVehicle', (req, res) => {
-    const { owner, vehicleName, renter } = req.body;
-    if (!owner || !vehicleName || !renter) {
+    const { owner, vehicleName, renter, rentalDuration } = req.body;
+    if (!owner || !vehicleName || !renter || !rentalDuration) {
         return res.status(400).json({ message: 'Invalid input' });
     }
     try {
-        // Find the original vehicle
         const vehicleTransaction = rentalChain.chain
             .flatMap(block => block.data)
             .find(t => t.owner === owner && t.vehicleName === vehicleName && t.type === 'vehicle_addition');
@@ -75,10 +74,12 @@ app.post('/api/rentVehicle', (req, res) => {
             return res.status(404).json({ message: 'Equipment not found' });
         }
 
-        // Create rental transaction with all vehicle details
+        const rentalEndDate = new Date(Date.now() + rentalDuration * 24 * 60 * 60 * 1000); // Convert days to milliseconds
+
         rentalChain.addTransaction({ 
-            ...vehicleTransaction, // Spread all properties from the original vehicle
+            ...vehicleTransaction,
             renter, 
+            rentalEndDate: rentalEndDate.toISOString(),
             type: 'vehicle_rental'
         });
         rentalChain.minePendingTransactions(renter);
@@ -89,24 +90,31 @@ app.post('/api/rentVehicle', (req, res) => {
     }
 });
 
-// API to get rented vehicles for a specific renter
+
 app.get('/api/rentedVehicles', (req, res) => {
     const renter = req.query.renter;
     if (!renter) {
         return res.status(400).json({ message: 'Renter not specified' });
     }
     try {
+        const currentDate = new Date();
         const rentedVehicles = rentalChain.chain
             .flatMap(block => block.data)
-            .filter(transaction => transaction.type === 'vehicle_rental' && transaction.renter === renter)
-            .map(({ owner, vehicleName, vehicleType, make, model, year, description, condition, rentalRate }) => 
-                ({ owner, vehicleName, vehicleType, make, model, year, description, condition, rentalRate }));
+            .filter(transaction => 
+                transaction.type === 'vehicle_rental' && 
+                transaction.renter === renter &&
+                new Date(transaction.rentalEndDate) > currentDate
+            )
+            .map(({ owner, vehicleName, vehicleType, make, model, year, description, condition, rentalRate, rentalEndDate }) => 
+                ({ owner, vehicleName, vehicleType, make, model, year, description, condition, rentalRate, rentalEndDate }));
         res.json(rentedVehicles);
     } catch (error) {
-        console.error("Error fetching rented vehicles:", error);
+        console.error("Error fetching rented equipments:", error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+
+
 
 // API to get all farm vehicles
 app.get('/api/vehicles', (req, res) => {
@@ -118,7 +126,7 @@ app.get('/api/vehicles', (req, res) => {
                 ({ owner, vehicleName, vehicleType, make, model, year, description, condition, rentalRate }));
         res.json(vehicles);
     } catch (error) {
-        console.error("Error fetching vehicles:", error);
+        console.error("Error fetching equipments:", error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
@@ -137,7 +145,7 @@ app.get('/api/myVehicles', (req, res) => {
                 ({ vehicleName, vehicleType, make, model, year, description, condition, rentalRate }));
         res.json(vehicles);
     } catch (error) {
-        console.error("Error fetching my vehicles:", error);
+        console.error("Error fetching my equipments:", error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
