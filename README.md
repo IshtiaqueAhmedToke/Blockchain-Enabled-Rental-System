@@ -53,6 +53,7 @@ Project Link: [https://github.com/yourusername/blockchain-rental-system](https:/
 ```
 
 ### Notes:
+- There is an issue with the customer-side UI refreshing. This version does not have a database connected for simplicity in testing and development.
 - Replace `yourusername` with your actual GitHub username and adjust URLs accordingly.
 - Ensure to include a `LICENSE` file in your project directory if not already present, specifying the license used for your project.
 
