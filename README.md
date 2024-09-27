@@ -24,7 +24,7 @@ To get a local copy up and running, follow these steps:
 
 1. Clone the repository:
    ```sh
-   git clone https://github.com/yourusername/blockchain-rental-system.git
+   git clone https://github.com/IshtiaqueAhmedToke/Blockchain-Enabled-Rental-System.git
    cd blockchain-rental-system
    ```
 
